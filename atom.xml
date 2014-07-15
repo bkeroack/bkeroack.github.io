@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[My Octopress Blog]]></title>
+  <title><![CDATA[asynch.ro]]></title>
   <link href="http://asynch.ro/atom.xml" rel="self"/>
   <link href="http://asynch.ro/"/>
-  <updated>2014-07-11T20:55:34-07:00</updated>
+  <updated>2014-07-15T05:27:40-07:00</updated>
   <id>http://asynch.ro/</id>
   <author>
-    <name><![CDATA[Your Name]]></name>
+    <name><![CDATA[Benjamen Keroack]]></name>
     
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
