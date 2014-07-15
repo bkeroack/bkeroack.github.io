@@ -4,7 +4,7 @@
   <title><![CDATA[Category: types | asynch.ro]]></title>
   <link href="http://asynch.ro/blog/categories/types/atom.xml" rel="self"/>
   <link href="http://asynch.ro/"/>
-  <updated>2014-07-15T15:41:21-07:00</updated>
+  <updated>2014-07-15T16:02:41-07:00</updated>
   <id>http://asynch.ro/</id>
   <author>
     <name><![CDATA[Benjamen Keroack]]></name>
@@ -19,7 +19,7 @@
     <updated>2014-07-15T12:54:28-07:00</updated>
     <id>http://asynch.ro/blog/2014/07/15/runtime-typing-in-python</id>
     <content type="html"><![CDATA[<p>In this post I will advocate for a particular style of Python coding which I call &ldquo;Runtime Type Checking&rdquo;, in order to
-help you write code that has clearer intent (and fewer implicit assumptions) and&mdash;hopefully&mdash;has fewer bugs.</p>
+help you write code that has clearer intent, fewer implicit assumptions, and&mdash;hopefully&mdash;fewer bugs.</p>
 
 <p>Just to be clear: Python doesn&rsquo;t need type checking like a statically-typed language. If you are coming to Python from
 another language with static typing, <em>please</em> don&rsquo;t try to force those idioms on Python. However I think it&rsquo;s useful to
@@ -29,14 +29,14 @@ deal with types explicitly <em>when they matter</em> which, as we will see, is a
 
 <p>In a nutshell: most (or all) of the methods you write have implicit assumptions about the parameters they accept.</p>
 
-<p>For example, by default function/method parameters will happily accept NoneType objects (as they should). However in the vast
+<p>For example, function/method parameters by default will happily accept NoneType objects (as they should). However in the vast
 majority of cases methods aren&rsquo;t designed to deal with None, resulting in the familiar
 &ldquo;<em>TypeError: &lsquo;NoneType&rsquo; object has no attribute [foo]</em>&rdquo; exceptions. You could litter your code with if <variable> blocks,
 but those are ugly. Frequently people ignore the possibility of None with the rationale that the code will break anyway
 and some exception will be thrown somewhere. However we want to fail as early as possible, and Runtime Type Checking helps
 to make sure that parameter assumptions are enforced.</p>
 
-<p>You might have function like the following:</p>
+<p>You might have a function or method like the following:</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>Example  (rtc_func_ex1.py)</span> <a href='/downloads/code/rtc_func_ex1.py'>download</a></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -53,7 +53,7 @@ to make sure that parameter assumptions are enforced.</p>
 <li>&lsquo;name&rsquo; exists (is not None) and is a string (or string-like)</li>
 <li>&lsquo;categories&rsquo; exists (is not None) and is an iterable like list or tuple. (You might extend the assumption to say
 that the iterable contains objects of type <strong>str</strong> or even valid categories that exist)</li>
-<li>&lsquo;attributes&rsquo; is also a container type of some sort (for argument, we will say that the function expects it to be a
+<li>&lsquo;attributes&rsquo; is also a container type of some sort (in this case we will say that the function expects it to be a
 dict) but may be empty or None.</li>
 </ul>
 
@@ -101,9 +101,9 @@ dict) but may be empty or None.</li>
 
 <ul>
 <li>We assert that the mandatory arguments exist (this will catch any arguments that are None). The first assert
-guarantees that both arguments are not None and that empty strings/interables will be caught.</li>
-<li>We assert that they have the <em>interface</em> that we expect (more on that below).</li>
-<li>We explictly allow an optional argument which <em>can</em> be None or a dictionary-like object.</li>
+guarantees that both arguments are not None and that empty strings/iterables will be caught.</li>
+<li>We assert that they have the interface/methods that we expect (more on that below).</li>
+<li>We allow an optional argument which <em>can</em> be None or a dictionary-like object.</li>
 </ul>
 
 
@@ -114,7 +114,7 @@ assert isinstance(categories, list)    #BAD
 assert isinstance(attributes, dict)    #BAD
 </code></p>
 
-<p>Why?</p>
+<p>Why not?</p>
 
 <h2><a name="assert_behavior"></a> Assert Behavior (or Interface), Not Identity</h2>
 
@@ -185,7 +185,7 @@ of an iterable is the &lsquo;__iter__&rsquo; method. We assert the existence of 
 base types <strong>str</strong>, <strong>int</strong> and possibly <strong>float</strong>, I don&rsquo;t see a problem with testing the class directly, but there certainly
 could be instances where this would be wrong. YMMV.</p>
 
-<h2>Other solutions</h2>
+<h2>Other Solutions</h2>
 
 <p>Some Pythonistas might point out that optional type checking already exists in Python 3 in the form of <a href="http://legacy.python.org/dev/peps/pep-3107/">function
 annotations</a>. This allows you to specify function parameter types
@@ -201,13 +201,13 @@ valid range&rdquo;, &ldquo;is string of length N&rdquo;, &ldquo;is iterable > N 
 <li>No need for third party modules.</li>
 <li>Works in Python 2.x</li>
 <li>Explicit asserts double as documentation and make code intent more clear. They are right there underneath the docstring
-and not off in some decorator definition.</li>
+and not off in some decorator definition somewhere.</li>
 </ul>
 
 
-<h2>Too slow?</h2>
+<h2>Too Slow?</h2>
 
-<p>In general I don&rsquo;t think this argument holds much water. If asserts are too slow you are using the wrong language for your
+<p>I don&rsquo;t think this argument holds much water. If asserts are too slow you are using the wrong language for your
 project. That said, you <em>can</em> turn asserts into no-ops by passing the <a href="http://stackoverflow.com/questions/2830358/what-are-the-implications-of-running-python-with-the-optimize-flag">-O flag</a>
 to the Python interpreter. I think this defeats the purpose of writing the type checking in the first place, but it&rsquo;s an option.</p>
 ]]></content>
