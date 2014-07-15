@@ -3,7 +3,7 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>asynch.ro</title>
+	<title>Runtime Type Checking in Python - asynch.ro</title>
 	<meta name="author" content="Benjamen Keroack">
 
 	
@@ -74,18 +74,9 @@ help you write &hellip;">
 	
 		
 	
-	<div id="content" class="inner">
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2014/07/15/runtime-typing-in-python/">
-		
-			Runtime Type Checking in Python</a>
-	</h2>
-	<div class="entry-content">
-		<p>In this post I will advocate for a particular style of Python coding which I call &ldquo;Runtime Type Checking&rdquo;, in order to
+	<div id="content" class="inner"><article class="post">
+	<h2 class="title">Runtime Type Checking in Python</h2>
+	<div class="entry-content"><p>In this post I will advocate for a particular style of Python coding which I call &ldquo;Runtime Type Checking&rdquo;, in order to
 help you write code that has clearer intent (and fewer implicit assumptions) and&mdash;hopefully&mdash;has fewer bugs.</p>
 
 <p>Just to be clear: Python doesn&rsquo;t need type checking like a statically-typed language. If you are coming to Python from
@@ -282,10 +273,7 @@ and not off in some decorator definition.</li>
 <p>In general I don&rsquo;t think this argument holds much water. If asserts are too slow you are using the wrong language for your
 project. That said, you <em>can</em> turn asserts into no-ops by passing the <a href="http://stackoverflow.com/questions/2830358/what-are-the-implications-of-running-python-with-the-optimize-flag">-O flag</a>
 to the Python interpreter. I think this defeats the purpose of writing the type checking in the first place, but it&rsquo;s an option.</p>
-
-		
-		
-	</div>
+</div>
 
 
 <div class="meta">
@@ -313,11 +301,20 @@ to the Python interpreter. I think this defeats the purpose of writing the type 
 </div>
 </article>
 
-<nav id="pagenavi">
-    
-    
-    <div class="center"><a href="/blog/archives">Blog Archives</a></div>
-</nav></div>
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+
+</div>
 	<footer id="footer" class="inner">Copyright &copy; 2014
 
     Benjamen Keroack
