@@ -19,8 +19,10 @@ In a nutshell: most (or all) of the methods you write have implicit assumptions 
 
 For example, function/method parameters by default will happily accept NoneType objects (as they should). However in the vast
 majority of cases methods aren't designed to deal with None, resulting in the familiar 
-"*TypeError: 'NoneType' object has no attribute [foo]*" exceptions. You could litter your code with if <variable> blocks,
-but those are ugly. Frequently people ignore the possibility of None with the rationale that the code will break anyway
+"*TypeError: 'NoneType' object has no attribute [foo]*" exceptions. This is sort of Python's version of a null reference
+exception. You could litter your code with if <variable> blocks, but those are ugly. 
+
+Typically people ignore the possibility of None with the rationale that the code will break somewhere anyway
 and some exception will be thrown somewhere. However we want to fail as early as possible, and Runtime Type Checking helps
 to make sure that parameter assumptions are enforced.
 
