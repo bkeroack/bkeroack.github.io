@@ -4,7 +4,7 @@
   <title><![CDATA[Category: programming, | asynch.ro]]></title>
   <link href="http://asynch.ro/blog/categories/programming/atom.xml" rel="self"/>
   <link href="http://asynch.ro/"/>
-  <updated>2014-07-15T16:02:41-07:00</updated>
+  <updated>2014-07-15T16:34:14-07:00</updated>
   <id>http://asynch.ro/</id>
   <author>
     <name><![CDATA[Benjamen Keroack]]></name>
@@ -31,8 +31,10 @@ deal with types explicitly <em>when they matter</em> which, as we will see, is a
 
 <p>For example, function/method parameters by default will happily accept NoneType objects (as they should). However in the vast
 majority of cases methods aren&rsquo;t designed to deal with None, resulting in the familiar
-&ldquo;<em>TypeError: &lsquo;NoneType&rsquo; object has no attribute [foo]</em>&rdquo; exceptions. You could litter your code with if <variable> blocks,
-but those are ugly. Frequently people ignore the possibility of None with the rationale that the code will break anyway
+&ldquo;<em>TypeError: &lsquo;NoneType&rsquo; object has no attribute [foo]</em>&rdquo; exceptions. This is sort of Python&rsquo;s version of a null reference
+exception. You could litter your code with if <variable> blocks, but those are ugly.</p>
+
+<p>Typically people ignore the possibility of None with the rationale that the code will break somewhere anyway
 and some exception will be thrown somewhere. However we want to fail as early as possible, and Runtime Type Checking helps
 to make sure that parameter assumptions are enforced.</p>
 
