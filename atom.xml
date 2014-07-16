@@ -4,7 +4,7 @@
   <title><![CDATA[asynch.ro]]></title>
   <link href="http://asynch.ro/atom.xml" rel="self"/>
   <link href="http://asynch.ro/"/>
-  <updated>2014-07-15T16:34:14-07:00</updated>
+  <updated>2014-07-15T18:19:37-07:00</updated>
   <id>http://asynch.ro/</id>
   <author>
     <name><![CDATA[Benjamen Keroack]]></name>
@@ -63,7 +63,7 @@ dict) but may be empty or None.</li>
 
 <h2>A Solution</h2>
 
-<p>Let&rsquo;s encode all these assumptions in the preamble to the function (and add a doctring while we&rsquo;re at it):</p>
+<p>Let&rsquo;s encode all these assumptions in the preamble to the function (and add a docstring while we&rsquo;re at it):</p>
 
 <figure class='code'><figcaption><span>Typed Example  (rtc_typing_example.py)</span> <a href='http://asynch.ro/downloads/code/rtc_typing_example.py'>download</a></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
