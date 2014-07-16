@@ -40,7 +40,7 @@ dict) but may be empty or None.
 
 ## A Solution
 
-Let's encode all these assumptions in the preamble to the function (and add a doctring while we're at it):
+Let's encode all these assumptions in the preamble to the function (and add a docstring while we're at it):
 
 {% include_code Typed Example lang:python rtc_typing_example.py %}
 
