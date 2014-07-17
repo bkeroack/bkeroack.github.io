@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: programming, | asynch.ro]]></title>
+  <title><![CDATA[Category: programming | asynch.ro]]></title>
   <link href="http://asynch.ro/blog/categories/programming/atom.xml" rel="self"/>
   <link href="http://asynch.ro/"/>
-  <updated>2014-07-15T18:22:22-07:00</updated>
+  <updated>2014-07-17T14:16:24-07:00</updated>
   <id>http://asynch.ro/</id>
   <author>
     <name><![CDATA[Benjamen Keroack]]></name>
@@ -14,11 +14,11 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Runtime Type Checking in Python]]></title>
+    <title type="html"><![CDATA[Runtime Type Verification in Python]]></title>
     <link href="http://asynch.ro/blog/2014/07/15/runtime-typing-in-python/"/>
     <updated>2014-07-15T12:54:28-07:00</updated>
     <id>http://asynch.ro/blog/2014/07/15/runtime-typing-in-python</id>
-    <content type="html"><![CDATA[<p>In this post I will advocate for a particular style of Python coding which I call &ldquo;Runtime Type Checking&rdquo;, in order to
+    <content type="html"><![CDATA[<p>In this post I advocate for a particular style of Python coding which I call &ldquo;Runtime Type Verification&rdquo; (RTV), in order to
 help you write code that has clearer intent, fewer implicit assumptions, and&mdash;hopefully&mdash;fewer bugs.</p>
 
 <p>Just to be clear: Python doesn&rsquo;t need type checking like a statically-typed language. If you are coming to Python from
@@ -29,13 +29,13 @@ deal with types explicitly <em>when they matter</em> which, as we will see, is a
 
 <p>In a nutshell: most (or all) of the methods you write have implicit assumptions about the parameters they accept.</p>
 
-<p>For example, function/method parameters by default will happily accept NoneType objects (as they should). However in the vast
-majority of cases methods aren&rsquo;t designed to deal with None, resulting in the familiar
+<p>For example, function/method parameters by default will happily accept NoneType objects (as would be expected). However
+in a lot of cases&mdash;probably the majority&mdash;methods aren&rsquo;t designed to deal with None, resulting in the familiar
 &ldquo;<em>TypeError: &lsquo;NoneType&rsquo; object has no attribute [foo]</em>&rdquo; exceptions. This is sort of Python&rsquo;s version of a null reference
-exception. You could litter your code with if <variable> blocks, but those are ugly.</p>
+exception.</p>
 
 <p>Typically people ignore the possibility of None with the rationale that the code will break somewhere anyway
-and some exception will be thrown somewhere. However we want to fail as early as possible, and Runtime Type Checking helps
+and some exception will be thrown somewhere. However we want to fail as early as possible, and RTV helps
 to make sure that parameter assumptions are enforced.</p>
 
 <p>You might have a function or method like the following:</p>
@@ -183,9 +183,112 @@ of an iterable is the &lsquo;__iter__&rsquo; method. We assert the existence of 
 </span><span class='line'>    <span class="k">return</span> <span class="n">save_to_database</span><span class="p">(</span><span class="n">user_obj</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>You&rsquo;ll notice that in the above I <em>am</em> explicitly testing that &ldquo;name&rdquo; is of class <strong>str</strong>, contradicting the rule. For the
-base types <strong>str</strong>, <strong>int</strong> and possibly <strong>float</strong>, I don&rsquo;t see a problem with testing the class directly, but there certainly
+<p>Arguably if you want to be more correct you could use the abstract base classes defined in the
+<a href="https://docs.python.org/2/library/collections.html">collections module</a>:</p>
+
+<p>``` python
+import collections</p>
+
+<h1>[&hellip;]</h1>
+
+<p>assert isinstance(categories, collections.Sequence)
+assert isinstance(attributes, collections.Mapping)
+```</p>
+
+<p>You&rsquo;ll notice that in the earlier example I <em>am</em> explicitly testing that &ldquo;name&rdquo; is of class <strong>str</strong>, contradicting the rule. For the
+base types <strong>str</strong>, <strong>int</strong> and possibly <strong>float</strong>, I don&rsquo;t see a problem with testing the class directly for base types, but there certainly
 could be instances where this would be wrong. YMMV.</p>
+
+<h2>Redundant Verification</h2>
+
+<p>Some might argue that if you follow the RTV pattern religiously you will have a lot of redundant verification going on.
+If Foo() calls Bar() which calls Baz(), passing certain common parameters down, why bother to check it multiple
+times by having verification in all three functions?</p>
+
+<p>The reason is that you want to the failure to be caught as early in the call stack as possible after data error occurs. Bad
+data will always cause a failure somewhere even with no verification whatsoever. The whole point of RTV is to surface the cause
+more easily be failing fast.</p>
+
+<h2>Taking It Further</h2>
+
+<p>Since we are using asserts to verify function parameter types, why not also use them inside function bodies (or at the end,
+before returning values)?</p>
+
+<p>Let&rsquo;s modify our example function slightly:
+<div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>Typed Example 3  (rtc_typing_example3.py)</span> <a href='/downloads/code/rtc_typing_example3.py'>download</a></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">def</span> <span class="nf">is_dict_like</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s">&#39;__getitem__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s">&#39;__setitem__&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">is_iterable</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s">&#39;__iter__&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">is_optional_dict</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">return</span> <span class="ow">not</span> <span class="n">obj</span> <span class="ow">or</span> <span class="n">is_dict_like</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">NewUser</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">categories</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+</span><span class='line'>    <span class="sd">&#39;&#39;&#39;</span>
+</span><span class='line'><span class="sd">    Create a new user.</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">    :param name: username</span>
+</span><span class='line'><span class="sd">    :param categories: iterable with categories the user belongs to</span>
+</span><span class='line'><span class="sd">    :param attributes: optional dictionary of attributes</span>
+</span><span class='line'><span class="sd">    :return: dictionary containing the user object if successful or None</span>
+</span><span class='line'><span class="sd">    &#39;&#39;&#39;</span>
+</span><span class='line'>    <span class="k">assert</span> <span class="n">name</span> <span class="ow">and</span> <span class="n">categories</span>
+</span><span class='line'>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">assert</span> <span class="n">is_iterable</span><span class="p">(</span><span class="n">categories</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">assert</span> <span class="n">is_optional_dict</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">user_obj</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">categories</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">result</span> <span class="o">=</span> <span class="n">save_to_database</span><span class="p">(</span><span class="n">user_obj</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">assert</span> <span class="ow">not</span> <span class="n">result</span> <span class="ow">or</span> <span class="p">(</span><span class="n">is_dict_like</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="ow">and</span> <span class="s">&#39;name&#39;</span> <span class="ow">in</span> <span class="n">result</span> <span class="ow">and</span> <span class="s">&#39;categories&#39;</span> <span class="ow">in</span> <span class="n">result</span> <span class="ow">and</span> <span class="s">&#39;attributes&#39;</span> <span class="ow">in</span> <span class="n">result</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">result</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Notice we&rsquo;ve changed the return type of save_to_database() to now return a dictionary of user object values if successful
+or None if there was a failure. Rather than return this without interrogation, we assert that the return value fits the
+structure we are expecting.</p>
+
+<p>Note that I&rsquo;m not saying to follow this exact pattern in every circumstance, there are certainly places where it would
+be stupidly redundant and verbose:</p>
+
+<p>``` python</p>
+
+<h1>stupid and unnecessary</h1>
+
+<p>list_of_stuff = list(&ldquo;foo&rdquo;, &ldquo;bar&rdquo;, &ldquo;baz&rdquo;)
+assert &ldquo;foo&rdquo; in list_of_stuff and &ldquo;bar&rdquo; in list_of_stuff and &ldquo;baz&rdquo; in list_of_stuff
+```</p>
+
+<p>I <strong>do</strong> think it is worth verifying the results of certain third party functions/methods if the results are structured,
+at least moderately complex and failure is a possibility.</p>
 
 <h2>Other Solutions</h2>
 
@@ -194,7 +297,7 @@ annotations</a>. This allows you to specify function parameter types
 in function and method definitions. With them you could use a module like <a href="https://github.com/ceronman/typeannotations">typeannotations</a>
 which raises a TypeError exception in the event of a type mismatch.</p>
 
-<p>I have no problem with these solutions, but I like Runtime Type Checking better.</p>
+<p>I have no problem with these solutions, but I like RTV better.</p>
 
 <ul>
 <li>Explicit asserts are more flexible. We don&rsquo;t just care about class type, we also care about things like &ldquo;is integer in
@@ -211,7 +314,7 @@ and not off in some decorator definition somewhere.</li>
 
 <p>I don&rsquo;t think this argument holds much water. If asserts are too slow you are using the wrong language for your
 project. That said, you <em>can</em> turn asserts into no-ops by passing the <a href="http://stackoverflow.com/questions/2830358/what-are-the-implications-of-running-python-with-the-optimize-flag">-O flag</a>
-to the Python interpreter. I think this defeats the purpose of writing the type checking in the first place, but it&rsquo;s an option.</p>
+to the Python interpreter. I think this defeats the purpose of writing the type verification in the first place, but it&rsquo;s an option.</p>
 ]]></content>
   </entry>
   
