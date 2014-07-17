@@ -49,7 +49,7 @@ Notice the following:
 * We assert that the mandatory arguments exist (this will catch any arguments that are None). The first assert
 guarantees that both arguments are not None and that empty strings/iterables will be caught.
 * We assert that they have the interface/methods that we expect (more on that below).
-* We allow an optional argument which *can* be None or a dictionary-like object.
+* We allow an optional argument which *can* be None or a dictionary-like object but nothing else.
 
 Notice in the above example, I did not do either of the following:
 
@@ -85,18 +85,21 @@ assert isinstance(attributes, collections.Mapping)
 ```
 
 You'll notice that in the earlier example I *am* explicitly testing that "name" is of class __str__, contradicting the rule. For the
-base types __str__, __int__ and possibly __float__, I don't see a problem with testing the class directly for base types, but there certainly
-could be instances where this would be wrong. YMMV.
+base types __str__, __int__ and possibly __float__, I don't see a problem with testing the class directly. There
+could be instances where this would be wrong (if you're doing something funky with integer methods for example). YMMV.
 
 ## Redundant Verification
 
 Some might argue that if you follow the RTV pattern religiously you will have a lot of redundant verification going on.
-If Foo() calls Bar() which calls Baz(), passing certain common parameters down, why bother to check it multiple
+If Foo() calls Bar() which calls Baz(), passing certain common parameters down, why bother to check them multiple
 times by having verification in all three functions?
 
 The reason is that you want to the failure to be caught as early in the call stack as possible after data error occurs. Bad
 data will always cause a failure somewhere even with no verification whatsoever. The whole point of RTV is to surface the cause
 more easily be failing fast.
+
+The other reason is that maybe you will decouple Foo() and Bar() at some point in the future. You want to make sure those
+parameters are always verified for all users of the functions.
 
 ## Taking It Further
 
@@ -119,8 +122,9 @@ list_of_stuff = list("foo", "bar", "baz")
 assert "foo" in list_of_stuff and "bar" in list_of_stuff and "baz" in list_of_stuff
 ```
 
-I __do__ think it is worth verifying the results of certain third party functions/methods if the results are structured,
-at least moderately complex and failure is a possibility.
+I __do__ think it is worth verifying the results of certain functions/methods if the results are structured,
+at least moderately complex and failure is a possibility. Especially third party ones where the return type might change
+unexpectedly.
 
 ## Other Solutions
  
