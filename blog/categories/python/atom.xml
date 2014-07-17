@@ -4,7 +4,7 @@
   <title><![CDATA[Category: python | asynch.ro]]></title>
   <link href="http://asynch.ro/blog/categories/python/atom.xml" rel="self"/>
   <link href="http://asynch.ro/"/>
-  <updated>2014-07-17T14:16:24-07:00</updated>
+  <updated>2014-07-17T14:44:53-07:00</updated>
   <id>http://asynch.ro/</id>
   <author>
     <name><![CDATA[Benjamen Keroack]]></name>
@@ -105,7 +105,7 @@ dict) but may be empty or None.</li>
 <li>We assert that the mandatory arguments exist (this will catch any arguments that are None). The first assert
 guarantees that both arguments are not None and that empty strings/iterables will be caught.</li>
 <li>We assert that they have the interface/methods that we expect (more on that below).</li>
-<li>We allow an optional argument which <em>can</em> be None or a dictionary-like object.</li>
+<li>We allow an optional argument which <em>can</em> be None or a dictionary-like object but nothing else.</li>
 </ul>
 
 
@@ -196,18 +196,21 @@ assert isinstance(attributes, collections.Mapping)
 ```</p>
 
 <p>You&rsquo;ll notice that in the earlier example I <em>am</em> explicitly testing that &ldquo;name&rdquo; is of class <strong>str</strong>, contradicting the rule. For the
-base types <strong>str</strong>, <strong>int</strong> and possibly <strong>float</strong>, I don&rsquo;t see a problem with testing the class directly for base types, but there certainly
-could be instances where this would be wrong. YMMV.</p>
+base types <strong>str</strong>, <strong>int</strong> and possibly <strong>float</strong>, I don&rsquo;t see a problem with testing the class directly. There
+could be instances where this would be wrong (if you&rsquo;re doing something funky with integer methods for example). YMMV.</p>
 
 <h2>Redundant Verification</h2>
 
 <p>Some might argue that if you follow the RTV pattern religiously you will have a lot of redundant verification going on.
-If Foo() calls Bar() which calls Baz(), passing certain common parameters down, why bother to check it multiple
+If Foo() calls Bar() which calls Baz(), passing certain common parameters down, why bother to check them multiple
 times by having verification in all three functions?</p>
 
 <p>The reason is that you want to the failure to be caught as early in the call stack as possible after data error occurs. Bad
 data will always cause a failure somewhere even with no verification whatsoever. The whole point of RTV is to surface the cause
 more easily be failing fast.</p>
+
+<p>The other reason is that maybe you will decouple Foo() and Bar() at some point in the future. You want to make sure those
+parameters are always verified for all users of the functions.</p>
 
 <h2>Taking It Further</h2>
 
@@ -287,8 +290,9 @@ be stupidly redundant and verbose:</p>
 assert &ldquo;foo&rdquo; in list_of_stuff and &ldquo;bar&rdquo; in list_of_stuff and &ldquo;baz&rdquo; in list_of_stuff
 ```</p>
 
-<p>I <strong>do</strong> think it is worth verifying the results of certain third party functions/methods if the results are structured,
-at least moderately complex and failure is a possibility.</p>
+<p>I <strong>do</strong> think it is worth verifying the results of certain functions/methods if the results are structured,
+at least moderately complex and failure is a possibility. Especially third party ones where the return type might change
+unexpectedly.</p>
 
 <h2>Other Solutions</h2>
 
