@@ -85,7 +85,7 @@ assert isinstance(attributes, collections.Mapping)
 ```
 
 You'll notice that in the earlier example I *am* explicitly testing that "name" is of class __str__, contradicting the rule. For the
-base types __str__, __int__ and possibly __float__, I don't see a problem with testing the class directly. There
+base types __str__, __int__ , __float__, etc., I don't see a problem with testing the class directly. There
 could be instances where this would be wrong (if you're doing something funky with integer methods for example). YMMV.
 
 ## Redundant Verification
