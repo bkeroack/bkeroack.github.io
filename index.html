@@ -270,7 +270,7 @@ of an iterable is the &lsquo;__iter__&rsquo; method. We assert the existence of 
 
 
 <p>You&rsquo;ll notice that in the earlier example I <em>am</em> explicitly testing that &ldquo;name&rdquo; is of class <strong>str</strong>, contradicting the rule. For the
-base types <strong>str</strong>, <strong>int</strong> and possibly <strong>float</strong>, I don&rsquo;t see a problem with testing the class directly. There
+base types <strong>str</strong>, <strong>int</strong> , <strong>float</strong>, etc., I don&rsquo;t see a problem with testing the class directly. There
 could be instances where this would be wrong (if you&rsquo;re doing something funky with integer methods for example). YMMV.</p>
 
 <h2>Redundant Verification</h2>
@@ -424,6 +424,8 @@ to the Python interpreter. I think this defeats the purpose of writing the type 
 
 </div>
 	
+	<div class="comments"><a href="/blog/2014/07/15/runtime-typing-in-python/#disqus_thread">Comments</a></div>
+	
 </div>
 </article>
 
@@ -445,6 +447,19 @@ to the Python interpreter. I think this defeats the purpose of writing the type 
 })(jQuery);
 </script> <!-- Delete or comment this line to disable Fancybox -->
 
+
+<script type="text/javascript">
+      var disqus_shortname = 'asynchro';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//go.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
 
 
 

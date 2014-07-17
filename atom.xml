@@ -4,7 +4,7 @@
   <title><![CDATA[asynch.ro]]></title>
   <link href="http://asynch.ro/atom.xml" rel="self"/>
   <link href="http://asynch.ro/"/>
-  <updated>2014-07-17T14:44:53-07:00</updated>
+  <updated>2014-07-17T15:14:01-07:00</updated>
   <id>http://asynch.ro/</id>
   <author>
     <name><![CDATA[Benjamen Keroack]]></name>
@@ -203,7 +203,7 @@ of an iterable is the &lsquo;__iter__&rsquo; method. We assert the existence of 
 
 
 <p>You&rsquo;ll notice that in the earlier example I <em>am</em> explicitly testing that &ldquo;name&rdquo; is of class <strong>str</strong>, contradicting the rule. For the
-base types <strong>str</strong>, <strong>int</strong> and possibly <strong>float</strong>, I don&rsquo;t see a problem with testing the class directly. There
+base types <strong>str</strong>, <strong>int</strong> , <strong>float</strong>, etc., I don&rsquo;t see a problem with testing the class directly. There
 could be instances where this would be wrong (if you&rsquo;re doing something funky with integer methods for example). YMMV.</p>
 
 <h2>Redundant Verification</h2>
