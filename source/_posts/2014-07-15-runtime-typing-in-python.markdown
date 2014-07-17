@@ -1,12 +1,12 @@
 ---
 layout: post
-title: "Runtime Type Checking in Python"
+title: "Runtime Type Verification in Python"
 date: 2014-07-15 12:54:28 -0700
 comments: true
-categories: Python, programming, coding, types
+categories: Python programming coding types
 ---
 
-In this post I will advocate for a particular style of Python coding which I call "Runtime Type Checking", in order to
+In this post I advocate for a particular style of Python coding which I call "Runtime Type Verification" (RTV), in order to
 help you write code that has clearer intent, fewer implicit assumptions, and--hopefully--fewer bugs.
 
 Just to be clear: Python doesn't need type checking like a statically-typed language. If you are coming to Python from
@@ -17,13 +17,13 @@ deal with types explicitly *when they matter* which, as we will see, is a lot of
 
 In a nutshell: most (or all) of the methods you write have implicit assumptions about the parameters they accept.
 
-For example, function/method parameters by default will happily accept NoneType objects (as they should). However in the vast
-majority of cases methods aren't designed to deal with None, resulting in the familiar 
+For example, function/method parameters by default will happily accept NoneType objects (as would be expected). However 
+in a lot of cases--probably the majority--methods aren't designed to deal with None, resulting in the familiar 
 "*TypeError: 'NoneType' object has no attribute [foo]*" exceptions. This is sort of Python's version of a null reference
-exception. You could litter your code with if <variable> blocks, but those are ugly. 
+exception.
 
 Typically people ignore the possibility of None with the rationale that the code will break somewhere anyway
-and some exception will be thrown somewhere. However we want to fail as early as possible, and Runtime Type Checking helps
+and some exception will be thrown somewhere. However we want to fail as early as possible, and RTV helps
 to make sure that parameter assumptions are enforced.
 
 You might have a function or method like the following:
@@ -74,9 +74,53 @@ You could create helper functions to make the code a bit more concise:
 
 {% include_code Typed Example 2 lang:python rtc_typing_example2.py %}
 
-You'll notice that in the above I *am* explicitly testing that "name" is of class __str__, contradicting the rule. For the
-base types __str__, __int__ and possibly __float__, I don't see a problem with testing the class directly, but there certainly
+Arguably if you want to be more correct you could use the abstract base classes defined in the 
+[collections module](https://docs.python.org/2/library/collections.html):
+ 
+``` python
+import collections
+#[...]
+assert isinstance(categories, collections.Sequence)
+assert isinstance(attributes, collections.Mapping)
+```
+
+You'll notice that in the earlier example I *am* explicitly testing that "name" is of class __str__, contradicting the rule. For the
+base types __str__, __int__ and possibly __float__, I don't see a problem with testing the class directly for base types, but there certainly
 could be instances where this would be wrong. YMMV.
+
+## Redundant Verification
+
+Some might argue that if you follow the RTV pattern religiously you will have a lot of redundant verification going on.
+If Foo() calls Bar() which calls Baz(), passing certain common parameters down, why bother to check it multiple
+times by having verification in all three functions?
+
+The reason is that you want to the failure to be caught as early in the call stack as possible after data error occurs. Bad
+data will always cause a failure somewhere even with no verification whatsoever. The whole point of RTV is to surface the cause
+more easily be failing fast.
+
+## Taking It Further
+
+Since we are using asserts to verify function parameter types, why not also use them inside function bodies (or at the end,
+before returning values)?
+
+Let's modify our example function slightly:
+{% include_code Typed Example 3 lang:python rtc_typing_example3.py %}
+
+Notice we've changed the return type of save_to_database() to now return a dictionary of user object values if successful
+or None if there was a failure. Rather than return this without interrogation, we assert that the return value fits the
+structure we are expecting.
+
+Note that I'm not saying to follow this exact pattern in every circumstance, there are certainly places where it would
+be stupidly redundant and verbose:
+
+``` python
+#stupid and unnecessary
+list_of_stuff = list("foo", "bar", "baz")
+assert "foo" in list_of_stuff and "bar" in list_of_stuff and "baz" in list_of_stuff
+```
+
+I __do__ think it is worth verifying the results of certain third party functions/methods if the results are structured,
+at least moderately complex and failure is a possibility.
 
 ## Other Solutions
  
@@ -85,7 +129,7 @@ annotations](http://legacy.python.org/dev/peps/pep-3107/). This allows you to sp
 in function and method definitions. With them you could use a module like [typeannotations](https://github.com/ceronman/typeannotations)
 which raises a TypeError exception in the event of a type mismatch.
 
-I have no problem with these solutions, but I like Runtime Type Checking better.
+I have no problem with these solutions, but I like RTV better.
 
 * Explicit asserts are more flexible. We don't just care about class type, we also care about things like "is integer in
 valid range", "is string of length N", "is iterable > N items", etc. __All__ these assumptions should be asserted.
@@ -99,4 +143,4 @@ and not off in some decorator definition somewhere.
 
 I don't think this argument holds much water. If asserts are too slow you are using the wrong language for your
 project. That said, you *can* turn asserts into no-ops by passing the [-O flag](http://stackoverflow.com/questions/2830358/what-are-the-implications-of-running-python-with-the-optimize-flag)
-to the Python interpreter. I think this defeats the purpose of writing the type checking in the first place, but it's an option.
+to the Python interpreter. I think this defeats the purpose of writing the type verification in the first place, but it's an option.
