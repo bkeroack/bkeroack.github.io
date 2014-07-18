@@ -14,7 +14,7 @@ def NewUser(name, categories, attributes=None):
     :param name: username
     :param categories: iterable with categories the user belongs to
     :param attributes: optional dictionary of attributes
-    :return: dictionary containing the user object if successful or None
+    :return: dictionary containing the user object fields if successful or None
     '''
     assert name and categories
     assert isinstance(name, str)

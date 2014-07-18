@@ -4,7 +4,7 @@
   <title><![CDATA[Category: programming | asynch.ro]]></title>
   <link href="http://asynch.ro/blog/categories/programming/atom.xml" rel="self"/>
   <link href="http://asynch.ro/"/>
-  <updated>2014-07-17T15:14:01-07:00</updated>
+  <updated>2014-07-17T17:42:51-07:00</updated>
   <id>http://asynch.ro/</id>
   <author>
     <name><![CDATA[Benjamen Keroack]]></name>
@@ -202,14 +202,14 @@ could be instances where this would be wrong (if you&rsquo;re doing something fu
 <h2>Redundant Verification</h2>
 
 <p>Some might argue that if you follow the RTV pattern religiously you will have a lot of redundant verification going on.
-If Foo() calls Bar() which calls Baz(), passing certain common parameters down, why bother to check them multiple
-times by having verification in all three functions?</p>
+If Foo() calls Bar() which calls Baz(), passing certain common parameters down, why bother to check them in all three
+functions?</p>
 
-<p>The reason is that you want to the failure to be caught as early in the call stack as possible after data error occurs. Bad
-data will always cause a failure somewhere even with no verification whatsoever. The whole point of RTV is to surface the cause
-more easily be failing fast.</p>
+<p>The reason is that you want to the failure to be caught as early in the call stack as possible after the data error occurs. Bad
+data will always cause a failure somewhere even with no verification at all. The whole point of RTV is to surface the cause
+more easily by failing fast.</p>
 
-<p>The other reason is that maybe you will decouple Foo() and Bar() at some point in the future. You want to make sure those
+<p>The other reason is that maybe Foo() and Bar() will be decoupled at some point in the future. You want to make sure those
 parameters are always verified for all users of the functions.</p>
 
 <h2>Taking It Further</h2>
@@ -262,7 +262,7 @@ before returning values)?</p>
 </span><span class='line'><span class="sd">    :param name: username</span>
 </span><span class='line'><span class="sd">    :param categories: iterable with categories the user belongs to</span>
 </span><span class='line'><span class="sd">    :param attributes: optional dictionary of attributes</span>
-</span><span class='line'><span class="sd">    :return: dictionary containing the user object if successful or None</span>
+</span><span class='line'><span class="sd">    :return: dictionary containing the user object fields if successful or None</span>
 </span><span class='line'><span class="sd">    &#39;&#39;&#39;</span>
 </span><span class='line'>    <span class="k">assert</span> <span class="n">name</span> <span class="ow">and</span> <span class="n">categories</span>
 </span><span class='line'>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
@@ -276,11 +276,11 @@ before returning values)?</p>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>Notice we&rsquo;ve changed the return type of save_to_database() to now return a dictionary of user object values if successful
-or None if there was a failure. Rather than return this without interrogation, we assert that the return value fits the
+or None if there was a failure. Rather than return the value without interrogation, we assert that the return value fits the
 structure we are expecting.</p>
 
-<p>Note that I&rsquo;m not saying to follow this exact pattern in every circumstance, there are certainly places where it would
-be stupidly redundant and verbose:</p>
+<p>Note that I&rsquo;m not saying to follow this exact pattern in <em>every</em> circumstance, there are certainly places where it would
+be redundant and verbose:</p>
 
 <p>``` python</p>
 
@@ -300,6 +300,9 @@ unexpectedly.</p>
 annotations</a>. This allows you to specify function parameter types
 in function and method definitions. With them you could use a module like <a href="https://github.com/ceronman/typeannotations">typeannotations</a>
 which raises a TypeError exception in the event of a type mismatch.</p>
+
+<p>There&rsquo;s also <a href="http://www.mypy-lang.org">MyPy</a> but it&rsquo;s not really Python per se, it&rsquo;s &ldquo;an experimental Python variant&rdquo;
+which supports optional static typing.</p>
 
 <p>I have no problem with these solutions, but I like RTV better.</p>
 
