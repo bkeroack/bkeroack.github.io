@@ -4,7 +4,7 @@
   <title><![CDATA[Category: coding | asynch.ro]]></title>
   <link href="http://asynch.ro/blog/categories/coding/atom.xml" rel="self"/>
   <link href="http://asynch.ro/"/>
-  <updated>2014-07-17T17:42:51-07:00</updated>
+  <updated>2014-07-17T17:49:25-07:00</updated>
   <id>http://asynch.ro/</id>
   <author>
     <name><![CDATA[Benjamen Keroack]]></name>
@@ -29,14 +29,18 @@ deal with types explicitly <em>when they matter</em> which, as we will see, is a
 
 <p>In a nutshell: most (or all) of the methods you write have implicit assumptions about the parameters they accept.</p>
 
-<p>For example, function/method parameters by default will happily accept NoneType objects (as would be expected). However
-in a lot of cases&mdash;probably the majority&mdash;methods aren&rsquo;t designed to deal with None, resulting in the familiar
+<p>For example, function/method parameters (I&rsquo;ll use the term &ldquo;function&rdquo; to mean both functions and class methods) by default
+will happily accept NoneType objects (as would be expected). However
+in a lot of cases&mdash;probably the majority&mdash;functions aren&rsquo;t designed to deal with None, resulting in the familiar
 &ldquo;<em>TypeError: &lsquo;NoneType&rsquo; object has no attribute [foo]</em>&rdquo; exceptions. This is sort of Python&rsquo;s version of a null reference
 exception.</p>
 
 <p>Typically people ignore the possibility of None with the rationale that the code will break somewhere anyway
 and some exception will be thrown somewhere. However we want to fail as early as possible, and RTV helps
 to make sure that parameter assumptions are enforced.</p>
+
+<p>Another example might a function that expects a dictionary with specific set of keys, or a list of length between X and Y.
+The possibilities go on. It&rsquo;s quite unusual to write a function that has zero knowledge of the arguments passed to it.</p>
 
 <p>You might have a function or method like the following:</p>
 
