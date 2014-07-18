@@ -17,14 +17,18 @@ deal with types explicitly *when they matter* which, as we will see, is a lot of
 
 In a nutshell: most (or all) of the methods you write have implicit assumptions about the parameters they accept.
 
-For example, function/method parameters by default will happily accept NoneType objects (as would be expected). However 
-in a lot of cases--probably the majority--methods aren't designed to deal with None, resulting in the familiar 
+For example, function/method parameters (I'll use the term "function" to mean both functions and class methods) by default 
+will happily accept NoneType objects (as would be expected). However 
+in a lot of cases--probably the majority--functions aren't designed to deal with None, resulting in the familiar 
 "*TypeError: 'NoneType' object has no attribute [foo]*" exceptions. This is sort of Python's version of a null reference
 exception.
 
 Typically people ignore the possibility of None with the rationale that the code will break somewhere anyway
 and some exception will be thrown somewhere. However we want to fail as early as possible, and RTV helps
 to make sure that parameter assumptions are enforced.
+
+Another example might a function that expects a dictionary with specific set of keys, or a list of length between X and Y.
+The possibilities go on. It's quite unusual to write a function that has zero knowledge of the arguments passed to it.
 
 You might have a function or method like the following:
 
