@@ -91,14 +91,14 @@ could be instances where this would be wrong (if you're doing something funky wi
 ## Redundant Verification
 
 Some might argue that if you follow the RTV pattern religiously you will have a lot of redundant verification going on.
-If Foo() calls Bar() which calls Baz(), passing certain common parameters down, why bother to check them multiple
-times by having verification in all three functions?
+If Foo() calls Bar() which calls Baz(), passing certain common parameters down, why bother to check them in all three 
+functions?
 
-The reason is that you want to the failure to be caught as early in the call stack as possible after data error occurs. Bad
-data will always cause a failure somewhere even with no verification whatsoever. The whole point of RTV is to surface the cause
-more easily be failing fast.
+The reason is that you want to the failure to be caught as early in the call stack as possible after the data error occurs. Bad
+data will always cause a failure somewhere even with no verification at all. The whole point of RTV is to surface the cause
+more easily by failing fast.
 
-The other reason is that maybe you will decouple Foo() and Bar() at some point in the future. You want to make sure those
+The other reason is that maybe Foo() and Bar() will be decoupled at some point in the future. You want to make sure those
 parameters are always verified for all users of the functions.
 
 ## Taking It Further
@@ -110,11 +110,11 @@ Let's modify our example function slightly:
 {% include_code Typed Example 3 lang:python rtc_typing_example3.py %}
 
 Notice we've changed the return type of save_to_database() to now return a dictionary of user object values if successful
-or None if there was a failure. Rather than return this without interrogation, we assert that the return value fits the
+or None if there was a failure. Rather than return the value without interrogation, we assert that the return value fits the
 structure we are expecting.
 
-Note that I'm not saying to follow this exact pattern in every circumstance, there are certainly places where it would
-be stupidly redundant and verbose:
+Note that I'm not saying to follow this exact pattern in *every* circumstance, there are certainly places where it would
+be redundant and verbose:
 
 ``` python
 #stupid and unnecessary
@@ -132,6 +132,9 @@ Some Pythonistas might point out that optional type checking already exists in P
 annotations](http://legacy.python.org/dev/peps/pep-3107/). This allows you to specify function parameter types
 in function and method definitions. With them you could use a module like [typeannotations](https://github.com/ceronman/typeannotations)
 which raises a TypeError exception in the event of a type mismatch.
+
+There's also [MyPy](http://www.mypy-lang.org) but it's not really Python per se, it's "an experimental Python variant"
+which supports optional static typing.
 
 I have no problem with these solutions, but I like RTV better.
 
