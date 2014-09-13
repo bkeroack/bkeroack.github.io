@@ -4,7 +4,7 @@
   <title><![CDATA[asynch.ro]]></title>
   <link href="http://asynch.ro/atom.xml" rel="self"/>
   <link href="http://asynch.ro/"/>
-  <updated>2014-09-05T15:59:58-07:00</updated>
+  <updated>2014-09-12T18:31:05-07:00</updated>
   <id>http://asynch.ro/</id>
   <author>
     <name><![CDATA[Benjamen Keroack]]></name>
@@ -12,6 +12,32 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Elita 0.60 is released]]></title>
+    <link href="http://asynch.ro/blog/2014/09/12/elita-0-dot-60-is-released/"/>
+    <updated>2014-09-12T18:24:47-07:00</updated>
+    <id>http://asynch.ro/blog/2014/09/12/elita-0-dot-60-is-released</id>
+    <content type="html"><![CDATA[<p>A new release of Elita was just pushed to PyPI (0.60). It contains the new featured called Package Map, which allows
+you to declaratively specify subpackages and have them automatically created on build upload. This was sort of the last
+piece missing from the core Elita feature set&mdash;previously you had to use a custom plugin to create packages. No longer!</p>
+
+<p>At this point, the only thing that requires a plugin are custom action endpoints (and hook actions, if desired). The
+whole automated deployment workflow is now completely supported by the core framework.</p>
+
+<p>Check out the docs:</p>
+
+<ul>
+<li><a href="http://elita.readthedocs.org/en/latest/gitdeploy.html#id3">Packages/package map explanation</a></li>
+<li><a href="http://elita.readthedocs.org/en/latest/app.html#packagemaps">Package map endpoints</a></li>
+</ul>
+
+
+<p>Release: <a href="https://pypi.python.org/pypi/elita">Elita on PyPI</a></p>
+
+<p>Feel free to ask any questions!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Elita 0.59 Released]]></title>
