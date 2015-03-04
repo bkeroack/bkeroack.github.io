@@ -3,11 +3,12 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>asynch.ro</title>
+	<title>Runtime Type Verification in Python - asynch.ro</title>
 	<meta name="author" content="Benjamen Keroack">
 
 	
-	<meta name="description" content="In hacker circles there&rsquo;s a common urban legend that it is somehow &ldquo;bad&rdquo; or inefficient to version binary files with git (&ldquo; &hellip;">
+	<meta name="description" content="In this post I advocate for a particular style of Python coding which I call &ldquo;Runtime Type Verification&rdquo; (RTV), in order to
+help you &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -78,328 +79,9 @@
 	
 		
 	
-	<div id="content" class="inner">
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2015/03/04/git-is-actually-ok-for-some-binaries/">
-		
-			Git Is Actually OK for (Some) Binaries</a>
-	</h2>
-	<div class="entry-content">
-		<p>In hacker circles there&rsquo;s a common urban legend that it is somehow &ldquo;bad&rdquo; or inefficient to version binary files with git (<a href="https://confluence.atlassian.com/display/BITBUCKET/Reduce+repository+size#Reducerepositorysize-DeletingFilesandotherMaintenance">&ldquo;DVCS systems are not good candidates for storing binary files&rdquo;</a>, <a href="https://robinwinslow.co.uk/2013/06/11/dont-ever-commit-binary-files-to-git/">&ldquo;Don&rsquo;t ever commit binary files to git&rdquo;</a>). In one recent Hacker News post, a commenter went so far as to write <a href="https://news.ycombinator.com/item?id=9139960">&ldquo;Anyone checking in 500MB artifacts into git is almost certainly refusing to use git correctly&rdquo;</a>. While 500MB may be a little on the big side for my taste,
-as long as they are the <em>right type</em> of binaries it should not be an issue.</p>
-
-<p>So let&rsquo;s discuss the types of binaries you might consider versioning within git<sup>1</sup>.</p>
-
-<p>Binary files that fit these constraints are good candidates for git versioning:</p>
-
-<ul>
-<li>Localized, relatively small changes between revisions (this mostly implies compressibility).</li>
-<li>Proportionality between source changes and resulting binary changes (ie, if the asset is produced by some process&mdash;compilation, etc&mdash;a small change in the source will result in a proportionately small change in the binary)</li>
-<li>&le; 150MB in size per file<sup>2</sup></li>
-</ul>
-
-
-<p>The reason these types of files work well in git is because git stores revisions as binary deltas, which are precisely what we want. In fact that&rsquo;s exactly how <a href="http://aws.amazon.com/codedeploy/">Amazon CodeDeploy</a> and my similar open source project <a href="https://github.com/bkeroack/elita">Elita</a> manage binary code deployments &mdash; by committing compiled files into a git repository, pushing to a central repository and then git pulling in the changes on the target servers.</p>
-
-<p>Let&rsquo;s do a little test.</p>
-
-<p>I have a simple Go program that I want to compile and version in git:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kn">package</span> <span class="nx">main</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="s">&quot;fmt&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;Hello, world!\n&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Compile it:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span><span class="nb">cd</span> ~/go/src/gittest
-</span><span class='line'><span class="nv">$ </span>go build
-</span><span class='line'><span class="nv">$ </span>ls -lh
-</span><span class='line'>total 3776
-</span><span class='line'>-rwxr-xr-x  1 bk  staff   1.8M Mar  4 08:17 gittest
-</span><span class='line'>-rw-rw-r--  1 bk  staff    75B Mar  4 08:16 test.go
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now we&rsquo;ll create a git repo and check these files in. Go programs compile to native machine code so this would be similar if the program was written in C or C++.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git init
-</span><span class='line'>Initialized empty Git repository in /Users/bk/go/src/gittest/.git/
-</span><span class='line'><span class="nv">$ </span>git add -A
-</span><span class='line'><span class="nv">$ </span>git commit -m <span class="s2">&quot;initial version&quot;</span>
-</span><span class='line'><span class="o">[</span>master <span class="o">(</span>root-commit<span class="o">)</span> 9a381bd<span class="o">]</span> initial version
-</span><span class='line'> 2 files changed, 7 insertions<span class="o">(</span>+<span class="o">)</span>
-</span><span class='line'> create mode 100755 gittest
-</span><span class='line'> create mode 100644 test.go
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now lets make a small change to our source code:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kn">package</span> <span class="nx">main</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="s">&quot;fmt&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;Hello, Arbre!\n&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Compile, commit it:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>go build
-</span><span class='line'><span class="nv">$ </span>git add -A <span class="o">&amp;&amp;</span> git commit -m <span class="s2">&quot;second version&quot;</span>
-</span><span class='line'><span class="o">[</span>master a00b091<span class="o">]</span> second version
-</span><span class='line'> 2 files changed, 1 insertion<span class="o">(</span>+<span class="o">)</span>, 1 deletion<span class="o">(</span>-<span class="o">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Cool. Now let&rsquo;s generate a binary patch for the executable and see how big it is:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git diff --binary master~1:gittest gittest &gt; ./diff.patch
-</span><span class='line'><span class="nv">$ </span>ls -lh
-</span><span class='line'>total 3784
-</span><span class='line'>drwxr-xr-x  12 bk  staff   408B Mar  4 08:34 .git
-</span><span class='line'>-rw-r--r--   1 bk  staff   404B Mar  4 08:39 diff.patch
-</span><span class='line'>-rwxr-xr-x   1 bk  staff   1.8M Mar  4 08:34 gittest
-</span><span class='line'>-rw-rw-r--   1 bk  staff    75B Mar  4 08:34 test.go
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>404 bytes! Nice. Here&rsquo;s what it looks like:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>diff --git a/gittest b/gittest
-</span><span class='line'>index 77923533b0c042ef0c45dda307bbc9c938070a87..ec7b9ebaf7c0e486a2faca8c55143824a1473016 100755
-</span><span class='line'>GIT binary patch
-</span><span class='line'>delta 107
-</span><span class='line'><span class="nv">zcmWN</span><span class="o">=</span>w+Vni00mIYIp?s9s<span class="p">|</span>YS<span class="p">|</span>VsG<span class="o">)</span>m<span class="o">)</span>?ow<span class="o">}</span>xmnKU3jc<span class="nv">$5</span>%j1^E2?Hi9*l^<span class="o">&amp;&amp;</span>gO30q
-</span><span class='line'>mBE<span class="o">(</span>PfDQ6L@*e&lt;OSPC4V83og0hnj3Dp&lt;DLf<span class="p">|</span>d3v&gt;<span class="o">)</span>&gt;-<span class="sb">`</span>7IJUHI~
-</span><span class='line'>
-</span><span class='line'>delta 107
-</span><span class='line'><span class="nv">zcmWN</span><span class="o">=</span>xe0<span class="o">(</span>k00cn%<span class="p">|</span>Ns0g<span class="p">&amp;</span>rlE<span class="o">)</span>F*R5<span class="o">)</span>wHU!hu9h&lt;~a0lj++a&lt;RH8gv*iVZnw27an<span class="o">{</span>B
-</span><span class='line'><span class="nv">l2</span><span class="o">=</span>C<span class="o">}</span>s<span class="o">)</span><span class="p">;</span><span class="o">=</span>%Ocz!D4m<span class="o">=</span>jJp&lt;D3f?Tyn<span class="o">)</span>VH<span class="o">{</span>5c^<span class="o">{</span>qw0otUue?IU4<span class="sb">`</span>~
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>That looks like a nice clean binary delta to me. Certainly it isn&rsquo;t an entire copy of the second version of the file.</p>
-
-<p>Now let&rsquo;s check out the original version of the binary:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git checkout master~1 2&gt; /dev/null
-</span><span class='line'><span class="nv">$ </span>./gittest
-</span><span class='line'>Hello, world!
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>&hellip;and apply the patch:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git apply ./diff.patch
-</span><span class='line'><span class="nv">$ </span>./gittest
-</span><span class='line'>Hello, Arbre!
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>As you can see the patched binary runs perfectly!</p>
-
-<p>One final thing. Let&rsquo;s check the size of the git metadata:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ls -lh
-</span><span class='line'>total 3784
-</span><span class='line'>drwxr-xr-x  12 bk  staff   408B Mar  4 08:41 .git
-</span><span class='line'>-rw-r--r--   1 bk  staff   404B Mar  4 08:39 diff.patch
-</span><span class='line'>-rwxr-xr-x   1 bk  staff   1.8M Mar  4 08:42 gittest
-</span><span class='line'>-rw-r--r--   1 bk  staff    75B Mar  4 08:41 test.go
-</span><span class='line'><span class="nv">$ </span>du -hs ./.git/
-</span><span class='line'>1.3M  ./.git/
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>1.3MB is less than the size of a single copy of the original binary (likely due to compression). This proves that git is not storing our binary revisions as entire copies of the file but as much more efficient deltas.</p>
-
-<p>For which types of binary files would git <em>not</em> be appropriate?</p>
-
-<p>Anything where changes between revisions are scattered throughout the file&mdash;for example, anything encrypted with a modern cipher will likely be almost completely different for even the most tiny of changes to the original plain text. Similar results can occur from compression.</p>
-
-<p>It will take some experimentation to see if your particular binary assets will work efficiently. Compiled executable binaries work particularly well. I&rsquo;ve used git for both native machine code binaries and .NET CLR binaries&mdash;I haven&rsquo;t tested JVM binaries specifically but imagine they would be similar. Images, music, etc may also be worth experimenting with.</p>
-
-<p>Thanks for reading and feel free to leave a comment with any corrections or additional info!</p>
-
-<hr />
-
-<ol>
-<li><p>I say git specifically because it is relatively smart about versioning binary assets as shown in this post, versus something like Mercurial which&mdash;last I knew&mdash;simply stored binary file revisions as flat blobs of the full file.</p></li>
-<li><p>This may actually be an urban legend as well. I&rsquo;m not familiar with git internals but my understanding is that the binary diffing algorithm gets inefficient above this threshold. I would love to hear if that is incorrect.</p></li>
-</ol>
-
-
-		
-		
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-03-04T07:52:53-08:00" pubdate data-updated="true">Mar 4<sup>th</sup>, 2015</time></div>
-	<div class="tags">
-
-
-	<a class='category' href='/blog/categories/dvcs/'>dvcs</a>, <a class='category' href='/blog/categories/git/'>git,</a>
-
-
-</div>
-	
-	<div class="comments"><a href="/blog/2015/03/04/git-is-actually-ok-for-some-binaries/#disqus_thread">Comments</a></div>
-	
-</div>
-</article>
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2014/08/29/elita-0-dot-59-released/">
-		
-			Elita 0.59 Released</a>
-	</h2>
-	<div class="entry-content">
-		<p>I&rsquo;m proud to announce the first public release of <a href="https://bitbucket.org/scorebig/elita">Elita</a>, the continuous deployment engine I wrote
-for ScoreBig in Python.</p>
-
-<p>There still are a bunch of features I want to implement but we are using it routinely on a daily basis and it&rsquo;s pretty
-stable so far.</p>
-
-<p>Find it on PyPI: <a href="http://pypi.python.org/pypi/elita">http://pypi.python.org/pypi/elita</a></p>
-
-<p>The docs are here: <a href="http://elita.readthedocs.org">http://elita.readthedocs.org</a> (a little outdated but nothing major)</p>
-
-<p>Feel free to ask any questions!</p>
-
-		
-		
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-08-29T18:13:07-07:00" pubdate data-updated="true">Aug 29<sup>th</sup>, 2014</time></div>
-	<div class="tags">
-
-
-	<a class='category' href='/blog/categories/deployment/'>deployment</a>, <a class='category' href='/blog/categories/devops/'>devops</a>, <a class='category' href='/blog/categories/infrastructure/'>infrastructure</a>, <a class='category' href='/blog/categories/python/'>python</a>, <a class='category' href='/blog/categories/rest/'>rest</a>
-
-
-</div>
-	
-	<div class="comments"><a href="/blog/2014/08/29/elita-0-dot-59-released/#disqus_thread">Comments</a></div>
-	
-</div>
-</article>
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2014/07/15/runtime-typing-in-python/">
-		
-			Runtime Type Verification in Python</a>
-	</h2>
-	<div class="entry-content">
-		<p>In this post I advocate for a particular style of Python coding which I call &ldquo;Runtime Type Verification&rdquo; (RTV), in order to
+	<div id="content" class="inner"><article class="post">
+	<h2 class="title">Runtime Type Verification in Python</h2>
+	<div class="entry-content"><p>In this post I advocate for a particular style of Python coding which I call &ldquo;Runtime Type Verification&rdquo; (RTV), in order to
 help you write code that has clearer intent, fewer implicit assumptions, and&mdash;hopefully&mdash;fewer bugs.</p>
 
 <p>Just to be clear: Python doesn&rsquo;t need type checking like a statically-typed language. If you are coming to Python from
@@ -717,10 +399,7 @@ and not off in some decorator definition somewhere.</li>
 <p>I don&rsquo;t think this argument holds much water. If asserts are too slow you are using the wrong language for your
 project. That said, you <em>can</em> turn asserts into no-ops by passing the <a href="http://stackoverflow.com/questions/2830358/what-are-the-implications-of-running-python-with-the-optimize-flag">-O flag</a>
 to the Python interpreter. I think this defeats the purpose of writing the type verification in the first place, but it&rsquo;s an option.</p>
-
-		
-		
-	</div>
+</div>
 
 
 <div class="meta">
@@ -745,16 +424,31 @@ to the Python interpreter. I think this defeats the purpose of writing the type 
 
 </div>
 	
-	<div class="comments"><a href="/blog/2014/07/15/runtime-typing-in-python/#disqus_thread">Comments</a></div>
+	<div class="comments"><a href="#disqus_thread">Comments</a></div>
 	
 </div>
 </article>
 
-<nav id="pagenavi">
-    
-    
-    <div class="center"><a href="/blog/archives">Blog Archives</a></div>
-</nav></div>
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+
+
+<section id="comment">
+    <h2 class="title">Comments</h2>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</section>
+</div>
 	<footer id="footer" class="inner">Copyright &copy; 2015
 
     Benjamen Keroack
@@ -773,7 +467,10 @@ to the Python interpreter. I think this defeats the purpose of writing the type 
       var disqus_shortname = 'asynchro';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://asynch.ro/blog/2014/07/15/runtime-typing-in-python/';
+        var disqus_url = 'http://asynch.ro/blog/2014/07/15/runtime-typing-in-python/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
