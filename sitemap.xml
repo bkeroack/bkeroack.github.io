@@ -3,6 +3,12 @@
   
   
   <url>
+    <loc>http://asynch.ro/blog/2015/03/19/dynamic-http-routing-in-go-with-travel/</loc>
+    <lastmod>2015-03-19T08:37:47-07:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
     <loc>http://asynch.ro/blog/2015/03/04/git-is-actually-ok-for-some-binaries/</loc>
     <lastmod>2015-03-04T07:52:53-08:00</lastmod>
     <priority>0.8</priority>
@@ -23,21 +29,21 @@
   
   <url>
     <loc>http://asynch.ro/blog/archives/</loc>
-    <lastmod>2015-03-04T09:08:48-08:00</lastmod>
+    <lastmod>2015-03-23T08:38:22-07:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://asynch.ro/</loc>
-    <lastmod>2015-03-04T09:08:48-08:00</lastmod>
+    <lastmod>2015-03-23T08:38:22-07:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   
   <url>
     <loc>http://asynch.ro/about/</loc>
-    <lastmod>2015-03-04T09:08:48-08:00</lastmod>
+    <lastmod>2015-03-23T08:38:22-07:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>

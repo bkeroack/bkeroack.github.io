@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: programming, | asynch.ro]]></title>
-  <link href="http://asynch.ro/blog/categories/programming/atom.xml" rel="self"/>
+  <title><![CDATA[Category: traversal, | asynch.ro]]></title>
+  <link href="http://asynch.ro/blog/categories/traversal/atom.xml" rel="self"/>
   <link href="http://asynch.ro/"/>
   <updated>2015-03-23T08:38:22-07:00</updated>
   <id>http://asynch.ro/</id>
