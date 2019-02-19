@@ -3,22 +3,22 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>http://example.org/projects/</loc>
+    <loc>https://asynch.ro/projects/</loc>
     <lastmod>2019-02-18T10:37:54-08:00</lastmod>
   </url>
   
   <url>
-    <loc>http://example.org/categories/</loc>
+    <loc>https://asynch.ro/categories/</loc>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://example.org/tags/</loc>
+    <loc>https://asynch.ro/tags/</loc>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://example.org/</loc>
+    <loc>https://asynch.ro/</loc>
     <lastmod>2019-02-18T10:37:54-08:00</lastmod>
     <priority>0</priority>
   </url>
