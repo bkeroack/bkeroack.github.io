@@ -17,7 +17,7 @@
       <pubDate>Mon, 18 Feb 2019 10:37:54 -0800</pubDate>
       
       <guid>https://asynch.ro/projects/</guid>
-      <description>2018  Acyl - Testing Environments On Demand. Build dynamic testing environments in Kubernetes, triggered by GitHub Pull Requests. Metahelm - Install and upgrade dependency graphs of Helm charts.  2017  Crudite - CRDTs backed by Kafka. PVC - Generic applications secrets library with backends for Vault, environment variables and JSON files. dynamo-drift - Migrations and ETL for DynamoDB tables.  2016  Furan - Horizontally-scalable Docker image build and push GRPC service, utilizing Cassandra and Kafka.</description>
+      <description>2019  Acyl - Testing Environments On Demand. Build dynamic testing environments in Kubernetes, triggered by GitHub Pull Requests.  2018  Metahelm - Install and upgrade dependency graphs of Helm charts. Crudite - CRDTs backed by Kafka.  2017  PVC - Generic applications secrets library with backends for Vault, environment variables and JSON files. dynamo-drift - Migrations and ETL for DynamoDB tables.  2016  Furan - Horizontally-scalable Docker image build and push GRPC service, utilizing Cassandra and Kafka.</description>
     </item>
     
   </channel>
