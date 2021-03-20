@@ -12,7 +12,7 @@
       <pubDate>Mon, 18 Feb 2019 10:37:54 -0800</pubDate>
       
       <guid>https://asynch.ro/projects/</guid>
-      <description>2020-21  Catalyst - Application Deployment on Kubernetes. Internal web application allowing engineering teams to self-deploy new services into a production Kubernetes platform. Inspired by tools like DigitalOcean App Platform.  2019  Acyl - Testing Environments On Demand. Build dynamic testing environments in Kubernetes, triggered by GitHub Pull Requests. I wrote a blog article explaining the history and use of Acyl.  2018  Metahelm - Install and upgrade dependency graphs of Helm charts.</description>
+      <description>2021  Catalyst - Application Deployment on Kubernetes. Internal web application allowing engineering teams to self-deploy new services into a production Kubernetes platform. Inspired by tools like DigitalOcean App Platform.  2019  Acyl - Testing Environments On Demand. Build dynamic testing environments in Kubernetes, triggered by GitHub Pull Requests. I wrote a blog article explaining the history and use of Acyl.  2018  Metahelm - Install and upgrade dependency graphs of Helm charts.</description>
     </item>
     
   </channel>
